@@ -1,0 +1,83 @@
+import React from "https://cdn.skypack.dev/react";
+import ReactDOM from "https://cdn.skypack.dev/react-dom";
+
+class QuoteBox extends React.Component {
+
+
+  constructor(props) {
+    super(props);
+    props.quotesArray = [];
+    
+    fetch('https://gist.githubusercontent.com/camperbot/5a022b72e96c4c9585c32bf6a75f62d9/raw/e3c6895ce42069f0ee7e991229064f167fe8ccdc/quotes.json')
+      .then(response => response.json())
+      .then(data => {
+        this.props.quotesArray = data;
+        this.randomQuote();
+    });
+
+    this.state = { 
+      clicked: false,
+      quote: "",
+      author: ""
+    };
+    this.randomQuote = this.randomQuote.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+    this.handleTweet = this.handleTweet.bind(this);
+  }
+
+  randomQuote = () => {     
+    const i = Math.floor(Math.random() * this.props.quotesArray.quotes.length);
+    console.log(`quotesArray is ${JSON.stringify(this.props.quotesArray.quotes[i])}`);
+    const quote = this.props.quotesArray.quotes[i].quote;
+    const author = this.props.quotesArray.quotes[i].author;
+    this.setState({ 
+      quote: quote,
+      author: author,
+    });
+  }
+
+  handleClick() {
+    this.randomQuote();
+  }
+  
+  handleTweet() {
+    location.href=`https://twitter.com/intent/tweet?hashtags=quotes&related=freecodecamp&text="${this.state.quote}"${this.state.author}`
+  }
+  
+  render() {
+    return (
+      <div>
+        <div id="quote-box">
+          <div className="quote-text">
+            <i className="fa fa-quote-left"></i>
+            <span id="text" >{this.state.quote}</span>
+            <i className="fa fa-quote-right"></i>
+          </div>
+          <div className="quote-author">
+            - 
+            <span id="author">{this.state.author}</span>
+          </div>
+          <div className="buttons">
+            <a className="button" id="tweet-quote" title="Tweet this quote!" target="_top" href={`https://twitter.com/intent/tweet?hashtags=quotes&related=freecodecamp&text="${this.state.quote}"${this.state.author}`}>
+              <i className="fa fa-twitter"></i>
+            </a>
+            <a className="button" id="tumblr-quote" title="Post this quote on tumblr!" target="_blank">
+              <i className="fa fa-tumblr"></i>
+            </a>
+            <button className={this.state.clicked ? "clicked" : ""} id="new-quote" onClick={this.handleClick}>
+              New quote
+            </button>
+          </div>
+        </div>
+        <div className="footer" > 
+          by 
+          <a href="https://codepen.io/noemie_brancourt/">
+            noemie
+          </a>
+        </div>
+      </div>
+    );
+  }
+};
+
+ReactDOM.render(<QuoteBox />, document.getElementById("wrapper"));
